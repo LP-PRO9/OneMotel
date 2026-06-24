@@ -1,0 +1,398 @@
+/* Reservar — reset lives in globals.css */
+    :root {
+      --bg:    #1A0A2E;
+      --card1: #0F0820;
+      --card2: #140E26;
+      --neon:  #E0187A;
+      --neon2: #FF2D9B;
+      --white: #F0EEF6;
+      --muted: rgba(240,238,246,0.45);
+      --border:rgba(240,238,246,0.09);
+      --serif: 'Instrument Serif', serif;
+      --sans:  'Archivo', sans-serif;
+    }
+    html, body { height: 100%; }
+    body { background: var(--bg); color: var(--white); font-family: var(--sans); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+
+    /* â”€â”€ NAV â”€â”€ */
+    .r-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(26,10,46,0.95) 0%, transparent 100%);
+    }
+    .r-nav-back {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.05);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--white); cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+    .r-nav-back svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .r-nav-logo { height: 28px; object-fit: contain; }
+    .r-nav-step { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; }
+
+    /* â”€â”€ WRAPPER â”€â”€ */
+    .booking-wrap {
+      min-height: 100vh;
+      padding-top: 0;
+      display: flex; flex-direction: column;
+      max-width: 480px; margin: 0 auto;
+    }
+
+    /* â”€â”€ CARD 1: SUITE â”€â”€ */
+    .card-suite {
+      position: relative;
+      height: 28vh; min-height: 180px; max-height: 230px;
+      border-radius: 0 0 32px 32px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .card-suite-bg {
+      position: absolute; inset: 0;
+    }
+    .card-suite-bg img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .card-suite-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(26,10,46,0.25) 0%, rgba(15,8,32,0.88) 100%);
+    }
+    .card-suite-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 28px 24px 32px;
+    }
+    .suite-selector-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(10px); border-radius: 999px;
+      padding: 6px 14px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); cursor: pointer; margin-bottom: 12px;
+      transition: border-color 0.2s, background 0.2s; width: fit-content;
+    }
+    .suite-selector-btn:hover { border-color: var(--neon); color: var(--white); }
+    .suite-selector-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .card-suite-name {
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(36px, 10vw, 56px); line-height: 0.9;
+      color: var(--white);
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+    .card-suite-sub {
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--neon); margin-top: 8px; opacity: 0.9;
+    }
+
+    /* â”€â”€ CARD 2: BOOKING â”€â”€ */
+    .card-booking {
+      background: var(--card2);
+      border-radius: 28px 28px 0 0;
+      margin-top: -20px;
+      flex: 1;
+      padding: 32px 24px 40px;
+      position: relative; z-index: 2;
+    }
+
+    /* STEP INDICATOR */
+    .step-indicator {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+    }
+    .step-dot {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase;
+    }
+    .step-dot-circle {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      transition: all 0.3s;
+    }
+    .step-dot.active .step-dot-circle {
+      border-color: var(--neon); background: var(--neon);
+      color: #fff; box-shadow: 0 0 12px rgba(224,24,122,0.5);
+    }
+    .step-dot.done .step-dot-circle {
+      border-color: var(--neon); background: transparent; color: var(--neon);
+    }
+    .step-dot.active .step-dot-label { color: var(--white); }
+    .step-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* STEP PANELS */
+    .steps-container { position: relative; overflow: hidden; }
+    .step-panel { transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s; }
+    .step-panel.hidden-left  { transform: translateX(-100%); opacity: 0; position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
+    .step-panel.hidden-right { transform: translateX(100%);  opacity: 0; position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
+    .step-panel.visible { transform: translateX(0); opacity: 1; }
+
+    /* â”€â”€ CALENDAR â”€â”€ */
+    .calendar-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .cal-month-label { font-size: 16px; font-weight: 600; color: var(--white); }
+    .cal-nav-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+      background: transparent; color: var(--white); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .cal-nav-btn:hover { border-color: var(--neon); background: rgba(224,24,122,0.08); }
+    .cal-nav-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+    .cal-days-header {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 8px;
+    }
+    .cal-day-name { text-align: center; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 4px 0; }
+
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-cell {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-size: 14px; font-weight: 500; cursor: pointer;
+      color: var(--white); transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .cal-cell:hover:not(.disabled):not(.empty) { background: rgba(224,24,122,0.15); }
+    .cal-cell.disabled { color: rgba(240,238,246,0.2); cursor: default; }
+    .cal-cell.empty { cursor: default; }
+    .cal-cell.today { color: var(--neon); font-weight: 700; }
+    .cal-cell.selected {
+      background: var(--neon); color: #fff; font-weight: 700;
+      box-shadow: 0 0 16px rgba(224,24,122,0.55);
+    }
+
+    /* â”€â”€ TIME PICKER (DRUM ROLL) â”€â”€ */
+    .time-picker-wrap {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; padding: 0 16px;
+    }
+    .drum-col-wrap {
+      flex: 1; position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .drum-col-label {
+      text-align: center; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .drum-arrow {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .drum-arrow:hover { color: var(--neon); border-color: rgba(224,24,122,0.5); background: rgba(224,24,122,0.08); }
+    .drum-arrow:active { transform: scale(0.92); }
+    .drum-arrow svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .drum-col {
+      height: 144px;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 48px 0;
+      position: relative;
+    }
+    .drum-col::-webkit-scrollbar { display: none; }
+    .drum-item {
+      height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      scroll-snap-align: center;
+      font-family: var(--serif); font-style: italic; font-size: 32px;
+      color: var(--white); cursor: pointer;
+      transition: color 0.1s;
+      user-select: none;
+    }
+
+    .drum-sep {
+      font-family: var(--serif); font-style: italic; font-size: 40px;
+      color: var(--neon); padding: 0 8px; margin-top: 74px;
+      text-shadow: 0 0 20px rgba(224,24,122,0.6);
+      flex-shrink: 0;
+    }
+
+
+    /* fade top/bottom of drum */
+    .drum-col-container { position: relative; }
+    .drum-col-fade {
+      position: absolute; left: 0; right: 0; pointer-events: none; z-index: 2;
+    }
+    .drum-col-fade.top    { top: 0;    height: 48px; background: linear-gradient(to bottom, var(--card2) 0%, transparent 100%); }
+    .drum-col-fade.bottom { bottom: 0; height: 48px; background: linear-gradient(to top,    var(--card2) 0%, transparent 100%); }
+
+    .time-display {
+      text-align: center; margin-top: 16px;
+      font-size: 13px; color: var(--muted); letter-spacing: 0.06em;
+    }
+    .time-display strong { color: var(--neon); font-size: 15px; }
+
+    /* â”€â”€ DATE DISPLAY (between steps) â”€â”€ */
+    .selected-date-badge {
+      display: none; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px; padding: 10px 20px 10px 14px;
+      margin-bottom: 20px; cursor: pointer; width: fit-content;
+      font-family: var(--sans); font-size: 14px; font-weight: 500; color: var(--white);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .selected-date-badge.show { display: inline-flex; }
+    .selected-date-badge:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.22); }
+    .selected-date-badge svg { width: 18px; height: 18px; stroke: var(--white); fill: none; stroke-width: 2.5; flex-shrink: 0; }
+
+    /* â”€â”€ SLIDE TO CONFIRM â”€â”€ */
+    .slide-wrap {
+      margin-top: 20px; position: sticky; bottom: 0; z-index: 10;
+      padding: 12px 0 4px;
+      background: linear-gradient(to top, var(--card2) 75%, transparent 100%);
+    }
+    .slide-track {
+      height: 62px; border-radius: 999px;
+      background: rgba(224,24,122,0.08);
+      border: 1.5px solid rgba(224,24,122,0.3);
+      position: relative; overflow: hidden; cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+    }
+    .slide-fill {
+      position: absolute; inset: 0; left: 0; right: auto;
+      background: linear-gradient(90deg, rgba(224,24,122,0.3), rgba(255,45,155,0.15));
+      border-radius: 999px; width: 0;
+      transition: none;
+    }
+    .slide-thumb {
+      position: absolute; top: 5px; left: 5px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--neon);
+      box-shadow: 0 0 20px rgba(224,24,122,0.7), 0 0 40px rgba(224,24,122,0.3);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; transition: box-shadow 0.2s;
+      will-change: transform;
+      z-index: 2;
+    }
+    .slide-thumb svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2.5; }
+    .slide-text {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(224,24,122,0.7); pointer-events: none;
+      padding-left: 62px; transition: opacity 0.2s;
+    }
+    .slide-track.success .slide-fill { width: 100%; background: var(--neon); }
+    .slide-track.success .slide-thumb { box-shadow: 0 0 30px rgba(224,24,122,0.9); }
+    .slide-track.success .slide-text { opacity: 0; }
+
+    /* â”€â”€ SUITE DROPDOWN SHEET â”€â”€ */
+    .sheet-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(26,10,46,0.75); backdrop-filter: blur(6px);
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .sheet-overlay.open { opacity: 1; pointer-events: all; }
+    .sheet {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 501;
+      background: #1A0E30; border-radius: 24px 24px 0 0;
+      padding: 16px 0 40px;
+      transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+      max-height: 70vh; overflow-y: auto;
+      max-width: 480px; margin: 0 auto;
+    }
+    .sheet.open { transform: translateY(0); }
+    .sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.15); margin: 0 auto 20px; }
+    .sheet-title { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0 24px; margin-bottom: 16px; }
+    .sheet-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 24px; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sheet-item:hover { background: rgba(255,255,255,0.04); }
+    .sheet-item.active { background: rgba(224,24,122,0.08); }
+    .sheet-item-img { width: 52px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .sheet-item-name { font-size: 15px; font-weight: 600; color: var(--white); }
+    .sheet-item-bloco { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .sheet-item-check { margin-left: auto; color: var(--neon); display: none; }
+    .sheet-item.active .sheet-item-check { display: block; }
+
+    /* â”€â”€ SUMMARY (before slide) â”€â”€ */
+    .booking-summary {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 16px; padding: 14px 20px; margin-top: 24px; margin-bottom: 0;
+      display: none;
+    }
+    .booking-summary.show { display: flex; align-items: flex-start; }
+    .bs-item {
+      flex: 1; display: flex; flex-direction: column; gap: 5px;
+      padding: 0 16px; border-right: 1px solid var(--border);
+    }
+    .bs-item:first-child { padding-left: 0; }
+    .bs-item:last-child  { border-right: none; padding-right: 0; }
+    .bs-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .bs-value { font-size: 13px; font-weight: 700; color: var(--white); white-space: nowrap; }
+
+    /* â”€â”€ TABLET â”€â”€ */
+    @media (min-width: 540px) and (max-width: 899px) {
+      .booking-wrap { border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+      .sheet { left: 50%; right: auto; width: 480px; transform: translateX(-50%) translateY(100%); }
+      .sheet.open { transform: translateX(-50%) translateY(0); }
+    }
+
+    /* â”€â”€ DESKTOP â”€â”€ */
+    @media (min-width: 900px) {
+      .r-nav {
+        background: rgba(26,10,46,0.96);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(240,238,246,0.06);
+        padding: 18px 48px;
+      }
+      .r-nav-logo { height: 34px; }
+
+      body { background: var(--bg); }
+
+      .booking-wrap {
+        max-width: 1200px;
+        flex-direction: row;
+        align-items: stretch;
+        min-height: auto;
+        margin: 90px auto 60px;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 32px 100px rgba(0,0,0,0.45), 0 0 0 1px var(--border);
+      }
+
+      .card-suite {
+        width: 42%;
+        flex-shrink: 0;
+        height: auto;
+        max-height: none;
+        min-height: 600px;
+        border-radius: 0;
+      }
+
+      .card-booking {
+        flex: 1;
+        border-radius: 0;
+        margin-top: 0;
+        overflow-y: auto;
+        padding: 48px 48px 48px 56px;
+        max-height: calc(100vh - 150px);
+      }
+
+
+      .sheet {
+        left: 50%; right: auto; width: 560px;
+        transform: translateX(-50%) translateY(100%);
+        border-radius: 24px;
+        bottom: auto; top: 50%; transform: translateX(-50%) translateY(-50%) scale(0.95);
+        opacity: 0; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s;
+        max-height: 80vh;
+      }
+      .sheet.open {
+        transform: translateX(-50%) translateY(-50%) scale(1);
+        opacity: 1;
+      }
+      .sheet-overlay { background: rgba(15,8,32,0.8); }
+    }
+
+    @media (min-width: 1200px) {
+      .card-booking { padding: 56px 64px 56px 64px; }
+    }
+
