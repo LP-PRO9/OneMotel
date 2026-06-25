@@ -9,6 +9,7 @@ import { MarqueeBar } from "@/components/layout/MarqueeBar";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { useGsapFadeUp } from "@/hooks/useGsapFadeUp";
+import { BLOCO_PRECOS } from "@/data/suites";
 import { encodeImagePath } from "@/lib/image-path";
 import { whatsappUrl } from "@/lib/constants";
 import "@/styles/home.css";
@@ -326,7 +327,7 @@ export function HomePage() {
                 </div>
                 <div className="suite-card-reveal">
                   <div className="suite-price-wrap">
-                    <span className="suite-price-val">R$ ---</span>
+                    <span className="suite-price-val">{BLOCO_PRECOS[suite.bloco]}</span>
                     <span className="suite-price-per">por período</span>
                   </div>
                   <span className="suite-reserve-btn">Ver Suíte →</span>

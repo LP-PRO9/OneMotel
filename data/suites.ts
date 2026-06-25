@@ -12,6 +12,13 @@
   proxima: string;
 }
 
+export const BLOCO_PRECOS: Record<string, string> = {
+  SIJI: "R$ 128,00",
+  EGY: "R$ 188,00",
+  EVAC: "R$ 218,00",
+  ONE: "R$ 498,00",
+};
+
 export const SUITES: Record<string, Suite> = {
 
   "one-101": {
@@ -354,3 +361,12 @@ export const SUITES: Record<string, Suite> = {
   }
 
 };
+
+for (const suite of Object.values(SUITES)) {
+  const preco = BLOCO_PRECOS[suite.bloco];
+  if (preco) {
+    suite.preco = preco;
+    const specIdx = suite.specs.findIndex((s) => s.startsWith("A partir de"));
+    if (specIdx >= 0) suite.specs[specIdx] = `A partir de ${preco}`;
+  }
+}
