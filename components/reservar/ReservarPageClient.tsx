@@ -40,6 +40,7 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
   const [minIdx, setMinIdx] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [slideSuccess, setSlideSuccess] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
 
   const drumHRef = useRef<HTMLDivElement>(null);
   const drumMRef = useRef<HTMLDivElement>(null);
@@ -137,6 +138,10 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
     return () => clearTimeout(t);
   }, [currentStep, updateDrumVisuals]);
 
+  useEffect(() => {
+    setIsTouch(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
+
   const getTrackMax = () => {
     const track = trackRef.current;
     return track ? track.offsetWidth - THUMB_W - 10 : 0;
@@ -189,6 +194,20 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
     fill.style.width = `${pos + THUMB_W + 10}px`;
     fill.style.opacity = String(pct);
     thumb.style.boxShadow = `0 0 ${20 + pct * 20}px rgba(224,24,122,${0.7 + pct * 0.3}), 0 0 ${40 + pct * 40}px rgba(224,24,122,${0.3 + pct * 0.2})`;
+  };
+
+  const tapConfirm = () => {
+    if (slideSuccess) return;
+    const thumb = thumbRef.current;
+    const fill = fillRef.current;
+    const max = getTrackMax();
+    if (thumb) thumb.style.transform = `translateX(${max}px)`;
+    if (fill) {
+      fill.style.width = `${max + THUMB_W + 10}px`;
+      fill.style.opacity = "1";
+    }
+    setSlideSuccess(true);
+    confirmBooking();
   };
 
   const endDrag = () => {
@@ -461,20 +480,25 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
 
               <div className="slide-wrap">
                 <div
-                  className={`slide-track${slideSuccess ? " success" : ""}`}
+                  className={`slide-track${slideSuccess ? " success" : ""}${isTouch ? " tap-mode" : ""}`}
                   ref={trackRef}
+                  role={isTouch ? "button" : undefined}
+                  tabIndex={isTouch ? 0 : undefined}
+                  onClick={isTouch ? tapConfirm : undefined}
                 >
                   <div className="slide-fill" ref={fillRef} />
                   <div
                     className="slide-thumb"
                     ref={thumbRef}
                     onMouseDown={(e) => {
+                      if (isTouch) return;
                       e.preventDefault();
                       draggingRef.current = true;
                       startXRef.current = e.clientX - thumbPosRef.current;
                       if (trackRef.current) trackRef.current.style.cursor = "grabbing";
                     }}
                     onTouchStart={(e) => {
+                      if (isTouch) return;
                       draggingRef.current = true;
                       startXRef.current = e.touches[0].clientX - thumbPosRef.current;
                     }}
@@ -483,7 +507,9 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
                       <polyline points="9,18 15,12 9,6" />
                     </svg>
                   </div>
-                  <div className="slide-text">Deslizar para confirmar</div>
+                  <div className="slide-text">
+                    {isTouch ? "Toque para confirmar" : "Deslizar para confirmar"}
+                  </div>
                 </div>
               </div>
             </div>
