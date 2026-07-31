@@ -40,7 +40,7 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
   const [minIdx, setMinIdx] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [slideSuccess, setSlideSuccess] = useState(false);
-  const [isTouch, setIsTouch] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const drumHRef = useRef<HTMLDivElement>(null);
   const drumMRef = useRef<HTMLDivElement>(null);
@@ -139,7 +139,11 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
   }, [currentStep, updateDrumVisuals]);
 
   useEffect(() => {
-    setIsTouch(window.matchMedia("(pointer: coarse)").matches);
+    const mq = window.matchMedia("(max-width: 899px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
   }, []);
 
   const getTrackMax = () => {
@@ -150,34 +154,46 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
   const resetSlide = () => {
     const thumb = thumbRef.current;
     const fill = fillRef.current;
-    if (!thumb || !fill) return;
-    thumb.style.transition = "transform 0.4s cubic-bezier(0.4,0,0.2,1)";
-    fill.style.transition = "width 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s";
-    thumbPosRef.current = 0;
-    thumb.style.transform = "translateX(0)";
-    fill.style.width = "0";
-    fill.style.opacity = "0";
-    setTimeout(() => {
-      thumb.style.transition = "";
-      fill.style.transition = "";
-    }, 400);
+    if (thumb && fill) {
+      thumb.style.transition = "transform 0.4s cubic-bezier(0.4,0,0.2,1)";
+      fill.style.transition = "width 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s";
+      thumbPosRef.current = 0;
+      thumb.style.transform = "translateX(0)";
+      fill.style.width = "0";
+      fill.style.opacity = "0";
+      setTimeout(() => {
+        thumb.style.transition = "";
+        fill.style.transition = "";
+      }, 400);
+    }
     setSlideSuccess(false);
   };
 
-  const confirmBooking = () => {
+  const buildWhatsAppUrl = () => {
     const d = selectedDate;
     const dayStr = d
       ? `${d.getDate()}/${String(d.getMonth() + 1).padStart(2, "0")}`
       : "—";
-    const url = bookingWhatsAppUrl({
+    return bookingWhatsAppUrl({
       suiteTitle: suite.titulo,
       dateLabel: dayStr,
       time: timeStr,
     });
+  };
+
+  const confirmBooking = () => {
+    const url = buildWhatsAppUrl();
     setTimeout(() => {
       window.open(url, "_blank");
       resetSlide();
     }, 800);
+  };
+
+  const confirmBookingNow = () => {
+    if (slideSuccess) return;
+    setSlideSuccess(true);
+    window.open(buildWhatsAppUrl(), "_blank");
+    setTimeout(() => setSlideSuccess(false), 1200);
   };
 
   const moveDrag = (clientX: number) => {
@@ -194,20 +210,6 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
     fill.style.width = `${pos + THUMB_W + 10}px`;
     fill.style.opacity = String(pct);
     thumb.style.boxShadow = `0 0 ${20 + pct * 20}px rgba(224,24,122,${0.7 + pct * 0.3}), 0 0 ${40 + pct * 40}px rgba(224,24,122,${0.3 + pct * 0.2})`;
-  };
-
-  const tapConfirm = () => {
-    if (slideSuccess) return;
-    const thumb = thumbRef.current;
-    const fill = fillRef.current;
-    const max = getTrackMax();
-    if (thumb) thumb.style.transform = `translateX(${max}px)`;
-    if (fill) {
-      fill.style.width = `${max + THUMB_W + 10}px`;
-      fill.style.opacity = "1";
-    }
-    setSlideSuccess(true);
-    confirmBooking();
   };
 
   const endDrag = () => {
@@ -479,38 +481,44 @@ export function ReservarPageClient({ suite: initialSuite, suiteId }: ReservarPag
               </div>
 
               <div className="slide-wrap">
-                <div
-                  className={`slide-track${slideSuccess ? " success" : ""}${isTouch ? " tap-mode" : ""}`}
-                  ref={trackRef}
-                  role={isTouch ? "button" : undefined}
-                  tabIndex={isTouch ? 0 : undefined}
-                  onClick={isTouch ? tapConfirm : undefined}
-                >
-                  <div className="slide-fill" ref={fillRef} />
-                  <div
-                    className="slide-thumb"
-                    ref={thumbRef}
-                    onMouseDown={(e) => {
-                      if (isTouch) return;
-                      e.preventDefault();
-                      draggingRef.current = true;
-                      startXRef.current = e.clientX - thumbPosRef.current;
-                      if (trackRef.current) trackRef.current.style.cursor = "grabbing";
-                    }}
-                    onTouchStart={(e) => {
-                      if (isTouch) return;
-                      draggingRef.current = true;
-                      startXRef.current = e.touches[0].clientX - thumbPosRef.current;
-                    }}
+                {isMobile ? (
+                  <button
+                    type="button"
+                    className={`confirm-btn${slideSuccess ? " success" : ""}`}
+                    onClick={confirmBookingNow}
                   >
+                    Confirmar reserva
                     <svg viewBox="0 0 24 24">
                       <polyline points="9,18 15,12 9,6" />
                     </svg>
+                  </button>
+                ) : (
+                  <div
+                    className={`slide-track${slideSuccess ? " success" : ""}`}
+                    ref={trackRef}
+                  >
+                    <div className="slide-fill" ref={fillRef} />
+                    <div
+                      className="slide-thumb"
+                      ref={thumbRef}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        draggingRef.current = true;
+                        startXRef.current = e.clientX - thumbPosRef.current;
+                        if (trackRef.current) trackRef.current.style.cursor = "grabbing";
+                      }}
+                      onTouchStart={(e) => {
+                        draggingRef.current = true;
+                        startXRef.current = e.touches[0].clientX - thumbPosRef.current;
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <polyline points="9,18 15,12 9,6" />
+                      </svg>
+                    </div>
+                    <div className="slide-text">Deslizar para confirmar</div>
                   </div>
-                  <div className="slide-text">
-                    {isTouch ? "Toque para confirmar" : "Deslizar para confirmar"}
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
