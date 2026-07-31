@@ -281,6 +281,21 @@
     .slide-track.success .slide-thumb { box-shadow: 0 0 30px rgba(224,24,122,0.9); }
     .slide-track.success .slide-text { opacity: 0; }
 
+    /* â”€â”€ CONFIRM BUTTON (mobile) â”€â”€ */
+    .confirm-btn {
+      width: 100%; height: 62px; border-radius: 999px; border: none;
+      background: linear-gradient(90deg, var(--neon), var(--neon2));
+      box-shadow: 0 0 20px rgba(224,24,122,0.45), 0 0 40px rgba(224,24,122,0.2);
+      color: #fff; font-family: var(--sans);
+      font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      cursor: pointer; user-select: none; -webkit-user-select: none;
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+    }
+    .confirm-btn svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 2.5; }
+    .confirm-btn:active { transform: scale(0.98); box-shadow: 0 0 24px rgba(224,24,122,0.6); }
+    .confirm-btn.success { opacity: 0.75; box-shadow: 0 0 30px rgba(224,24,122,0.9); }
+
     /* â”€â”€ SUITE DROPDOWN SHEET â”€â”€ */
     .sheet-overlay {
       position: fixed; inset: 0; z-index: 500;
