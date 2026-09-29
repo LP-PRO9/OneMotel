@@ -13,10 +13,10 @@
 }
 
 export const BLOCO_PRECOS: Record<string, string> = {
-  SIJI: "R$ 128,00",
-  EGY: "R$ 188,00",
-  EVAC: "R$ 218,00",
-  ONE: "R$ 498,00",
+  SIJI: "R$ 139,00",
+  EGY: "R$ 204,00",
+  EVAC: "R$ 235,00",
+  ONE: "R$ 539,00",
 };
 
 export const SUITES: Record<string, Suite> = {
